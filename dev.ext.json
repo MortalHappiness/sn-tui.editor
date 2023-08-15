@@ -1,0 +1,13 @@
+{
+  "identifier": "mortalhappiness.sn-tui.editor.dev",
+  "name": "Tui Markdown Editor (Developing)",
+  "content_type": "SN|Component",
+  "area": "editor-editor",
+  "version": "0.1.0",
+  "description": "Toast UI Markdown Editor for Standard Notes",
+  "url": "http://localhost:3000/index.html",
+  "download_url": "",
+  "latest_url": "",
+  "marketing_url": "",
+  "thumbnail_url": ""
+}
