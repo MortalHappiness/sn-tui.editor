@@ -1,4 +1,4 @@
-# Standard Notes Quill Rich Editor Extension
+# Standard Notes Toast UI Markdown Editor Extension
 
 An extension for Standard Notes using [Toast UI Markdown Editor](https://github.com/nhn/tui.editor).
 
