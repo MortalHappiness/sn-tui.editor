@@ -1,31 +1,47 @@
 import React from 'react';
+import clsx from 'clsx';
 import EditorKit, { EditorKitDelegate } from '@standardnotes/editor-kit';
 import { AppDataField } from '@standardnotes/models';
+import '@toast-ui/editor/dist/toastui-editor.css';
+import TuiEditor, { Viewer as TuiViewer } from '@toast-ui/editor';
 
-export enum HtmlElementId {
-  snComponent = 'sn-component',
-  textarea = 'textarea',
-}
+// Color Syntax plugin
+import 'tui-color-picker/dist/tui-color-picker.css';
+import '@toast-ui/editor-plugin-color-syntax/dist/toastui-editor-plugin-color-syntax.css';
+import colorSyntax from '@toast-ui/editor-plugin-color-syntax';
 
-export enum HtmlClassName {
-  snComponent = 'sn-component',
-  textarea = 'sk-input contrast textarea',
-}
+// Table Merge Cell plugin
+import '@toast-ui/editor-plugin-table-merged-cell/dist/toastui-editor-plugin-table-merged-cell.css';
+import tableMergedCell from '@toast-ui/editor-plugin-table-merged-cell';
+
+// Code Syntax Highlight plugin
+import 'prismjs/themes/prism.css';
+import '@toast-ui/editor-plugin-code-syntax-highlight/dist/toastui-editor-plugin-code-syntax-highlight.css';
+const codeSyntaxHighlight = require('@toast-ui/editor-plugin-code-syntax-highlight/dist/toastui-editor-plugin-code-syntax-highlight-all.js');
 
 export interface EditorInterface {
-  printUrl: boolean;
-  text: string;
+  isLocked: boolean;
 }
 
 const initialState = {
-  printUrl: false,
-  text: '',
+  isLocked: false,
 };
 
 let keyMap = new Map();
 
+const commonOptions = {
+  usageStatistics: false,
+  height: '100%',
+  plugins: [colorSyntax, codeSyntaxHighlight, tableMergedCell],
+};
+
 export default class Editor extends React.Component<{}, EditorInterface> {
   private editorKit?: EditorKit;
+  private editorEl = React.createRef<HTMLDivElement>();
+  private viewerEl = React.createRef<HTMLDivElement>();
+  private tuiEditor?: TuiEditor;
+  private tuiViewer?: TuiViewer;
+  private origEditorRawText = '';
 
   constructor(props: EditorInterface) {
     super(props);
@@ -40,31 +56,64 @@ export default class Editor extends React.Component<{}, EditorInterface> {
     const delegate: EditorKitDelegate = {
       /** This loads every time a different note is loaded */
       setEditorRawText: (text: string) => {
-        this.setState({
-          ...initialState,
-          text,
-        });
+        this.origEditorRawText = text;
+        const isLocked = this.editorKit?.getItemAppDataValue(
+          AppDataField.Locked
+        );
+        this.setState({ isLocked });
+        this.setUpTuiEditor(text);
       },
       clearUndoHistory: () => {},
       handleRequestForContentHeight: () => undefined,
+      onNoteLockToggle: (isLocked) => {
+        const text = isLocked
+          ? this.tuiEditor!.getMarkdown()
+          : this.origEditorRawText;
+        this.setUpTuiEditor(text);
+        this.setState({ isLocked });
+      },
     };
 
     this.editorKit = new EditorKit(delegate, {
-      mode: 'plaintext',
+      mode: 'markdown',
     });
   };
 
-  handleInputChange = (event: React.ChangeEvent<HTMLTextAreaElement>) => {
-    const target = event.target;
-    const value = target.value;
-    this.saveText(value);
+  setUpTuiEditor = (text: string) => {
+    if (this.state.isLocked) {
+      this.initTuiViewer(text);
+    } else {
+      this.initTuiEditor(text);
+    }
   };
 
-  saveText = (text: string) => {
-    this.saveNote(text);
-    this.setState({
-      text: text,
-    });
+  initTuiEditor = (text: string) => {
+    if (!this.tuiEditor) {
+      const isMobile = window.matchMedia('(max-width: 650px)').matches;
+      this.tuiEditor = new TuiEditor({
+        el: this.editorEl.current!,
+        initialEditType: isMobile ? 'wysiwyg' : 'markdown',
+        previewStyle: isMobile ? 'tab' : 'vertical',
+        initialValue: text,
+        ...commonOptions,
+      });
+      this.tuiEditor.on('change', () => {
+        const text = this.tuiEditor?.getMarkdown() || '';
+        this.tuiViewer?.setMarkdown(text);
+        this.saveNote(text);
+      });
+    }
+  };
+
+  initTuiViewer = (text: string) => {
+    if (!this.tuiViewer) {
+      this.tuiViewer = TuiEditor.factory({
+        el: this.viewerEl.current!,
+        viewer: true,
+        initialValue: text,
+        ...commonOptions,
+      });
+    }
   };
 
   saveNote = (text: string) => {
@@ -96,53 +145,13 @@ export default class Editor extends React.Component<{}, EditorInterface> {
   };
 
   render() {
-    const { text } = this.state;
-    const locked = this.editorKit?.getItemAppDataValue(AppDataField.Locked);
+    const { isLocked } = this.state;
     return (
-      <div
-        className={
-          HtmlElementId.snComponent + (this.state.printUrl ? ' print-url' : '')
-        }
-        id={HtmlElementId.snComponent}
-        tabIndex={0}
-      >
-        <p>
-          Edit <code>src/components/Editor.tsx</code> and save to reload.
-        </p>
-        <p>
-          Visit the{' '}
-          <a
-            href="https://docs.standardnotes.org/extensions/intro"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Standard Notes documentation
-          </a>{' '}
-          to learn how to work with the Standard Notes API or{' '}
-          <a
-            href="https://reactjs.org"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Learn React
-          </a>
-          .
-        </p>
-        <textarea
-          id={HtmlElementId.textarea}
-          name="text"
-          className={'sk-input contrast textarea'}
-          placeholder="Type here. Text in this textarea is automatically saved in Standard Notes"
-          rows={15}
-          spellCheck="true"
-          value={text}
-          onBlur={this.onBlur}
-          onChange={this.handleInputChange}
-          onFocus={this.onFocus}
-          onKeyDown={this.onKeyDown}
-          onKeyUp={this.onKeyUp}
-          disabled={Boolean(locked)}
-        />
+      <div className="container">
+        <div ref={this.editorEl} className={clsx(isLocked && 'hidden')} />
+        <div className={clsx('viewer', !isLocked && 'hidden')}>
+          <div ref={this.viewerEl} />
+        </div>
       </div>
     );
   }
