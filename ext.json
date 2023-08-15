@@ -1,6 +1,6 @@
 {
   "identifier": "mortalhappiness.sn-tui.editor.dev",
-  "name": "Tui Markdown Editor (Developing)",
+  "name": "Tui Markdown Editor",
   "content_type": "SN|Component",
   "area": "editor-editor",
   "version": "0.1.0",
