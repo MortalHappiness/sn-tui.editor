@@ -5,7 +5,7 @@
   "area": "editor-editor",
   "version": "0.1.0",
   "description": "Toast UI Markdown Editor for Standard Notes",
-  "url": "http://localhost:3000/index.html",
+  "url": "http://localhost:8001/index.html",
   "download_url": "",
   "latest_url": "",
   "marketing_url": "",
