@@ -54,32 +54,99 @@ html {
   border: 0;
 }
 
-.toastui-editor-contents,
-.ProseMirror {
+.toastui-editor-defaultUI-toolbar,
+.toastui-editor-dropdown-toolbar {
+  background-color: var(--sn-stylekit-secondary-background-color);
+}
+
+.toastui-editor-mode-switch {
+  background-color: var(--sn-stylekit-background-color);
+
+  .tab-item {
+    background-color: var(--sn-stylekit-secondary-background-color);
+  }
+
+  .tab-item.active {
+    background-color: var(--sn-stylekit-background-color);
+    color: var(--sn-stylekit-paragraph-text-color);
+  }
+}
+
+.ProseMirror,
+.toastui-editor-contents {
   font-size: var(--sn-stylekit-font-size-editor);
+  color: var(--sn-stylekit-paragraph-text-color);
 }
 
-a {
-  color: var(--sn-stylekit-info-color); // #086dd6;
-  text-decoration: none;
+.ProseMirror {
+  .toastui-editor-md-table-cell {
+    color: var(--sn-stylekit-paragraph-text-color);
+  }
+
+  .toastui-editor-md-code,
+  .toastui-editor-md-code-block-line-background {
+    background-color: var(--sn-stylekit-contrast-background-color);
+  }
 }
 
-a:hover {
-  text-decoration: underline;
+.toastui-editor-contents {
+  p,
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    color: var(--sn-stylekit-paragraph-text-color);
+  }
+
+  h1,
+  h2 {
+    border-color: var(--sn-stylekit-paragraph-text-color);
+  }
+
+  pre,
+  code {
+    background-color: var(--sn-stylekit-contrast-background-color);
+  }
+
+  table,
+  table th,
+  table td {
+    border-color: var(--sn-stylekit-border-color);
+  }
+
+  table td,
+  table td p {
+    color: var(--sn-stylekit-paragraph-text-color);
+  }
+
+  a {
+    color: var(--sn-stylekit-info-color); // #086dd6;
+    text-decoration: none;
+  }
+
+  a:hover {
+    text-decoration: underline;
+  }
+
+  code {
+    box-sizing: border-box;
+    word-wrap: break-word;
+    padding: 0.2em 0.4em;
+    margin: 0;
+    font-size: 85%;
+    border-radius: 3px;
+  }
+
+  p {
+    padding: 0px 1em;
+  }
 }
 
-code {
-  box-sizing: border-box;
-  word-wrap: break-word;
-  padding: 0.2em 0.4em;
-  margin: 0;
-  font-size: 85%;
-  background-color: var(--sn-stylekit-contrast-background-color);
-  border-radius: 3px;
-}
-
-p {
-  padding: 0px 1em;
+.toastui-editor-ww-container {
+  background-color: var(--sn-stylekit-editor-background-color);
+  color: var(--sn-stylekit-editor-foreground-color);
 }
 
 @import './dark.scss';
