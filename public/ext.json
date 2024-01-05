@@ -3,7 +3,7 @@
   "name": "Tui Markdown Editor",
   "content_type": "SN|Component",
   "area": "editor-editor",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "description": "Toast UI Markdown Editor for Standard Notes",
   "url": "https://mortalhappiness.github.io/sn-tui.editor",
   "download_url": "https://github.com/MortalHappiness/sn-tui.editor",
